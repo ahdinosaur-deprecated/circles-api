@@ -162,7 +162,12 @@ describe "#groups", ->
       done()
     )
 
+  after (done) ->
+      # del all objects in db
+      db.createKeyStream()
+      .on 'data', (k) ->
+        db.del(k)
+      .on 'close', ->
+        done()
 
-
-
-
+  @

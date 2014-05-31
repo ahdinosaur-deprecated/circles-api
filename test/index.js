@@ -150,7 +150,7 @@
         return done();
       });
     });
-    return it("should not GET deleted id", function(done) {
+    it("should not GET deleted id", function(done) {
       return request.get("/groups/" + urlencode(group.id)).expect("Content-Type", /json/).expect(404).end(function(err, res) {
         if (err) {
           return done(err);
@@ -158,6 +158,14 @@
         return done();
       });
     });
+    after(function(done) {
+      return db.createKeyStream().on('data', function(k) {
+        return db.del(k);
+      }).on('close', function() {
+        return done();
+      });
+    });
+    return this;
   });
 
 }).call(this);
