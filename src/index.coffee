@@ -100,7 +100,6 @@ module.exports = (db) ->
   # CRUD functions
   #
   find = (query, callback) ->
-    console.log query
     db.search query, (error, groups) ->
       if error
         callback(error)
@@ -122,7 +121,6 @@ module.exports = (db) ->
 
   get = (id, callback) ->
     db.jsonld.get id, {'@context': context}, (error, group) ->
-      console.log error, group
       if error
         callback error
       else
@@ -195,7 +193,6 @@ module.exports = (db) ->
     body = req.body
     create(body, null)
       .then((group) -> 
-        console.log 'group from post', group
         res.json 201,
           group)
     return
@@ -238,8 +235,6 @@ module.exports = (db) ->
         if not group?
           res.json 404, null
         else
-          console.log group, 'get id subResource'
-
           res.json 200, group[subResource])
 
   # return express app
