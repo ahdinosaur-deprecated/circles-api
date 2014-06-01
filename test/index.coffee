@@ -161,7 +161,7 @@ describe "#groups", ->
       done()
     )
 
-  after (done) ->
+  afterEach (done) ->
       # del all objects in db
       db.createKeyStream()
       .on 'data', (k) ->

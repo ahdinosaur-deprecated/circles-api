@@ -144,7 +144,7 @@
         return done();
       });
     });
-    after(function(done) {
+    afterEach(function(done) {
       return db.createKeyStream().on('data', function(k) {
         return db.del(k);
       }).on('close', function() {
