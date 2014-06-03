@@ -115,7 +115,7 @@ module.exports = (db) ->
     data = alias(data, "id", "@id")
     db.jsonld.put data, (error, group) ->
       # if error, return error
-      return callback(err) if error
+      return callback(error) if error
       # return group
       compact(group, context, callback)
 
@@ -142,12 +142,12 @@ module.exports = (db) ->
     # if id in route doesn't match id in data, return 400
     if data["@id"] isnt id
       error = new Error("id in route does not match id in data")
-      err.status = 400
-      return callback(err)
+      error.status = 400
+      return callback(error)
     # put group in database
     db.jsonld.put data, (error, group) ->
       # if error, return error
-      return callback(err) if error
+      return callback(error) if error
       # return group
       compact(group, context, callback)
 
