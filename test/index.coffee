@@ -2,8 +2,11 @@ request = require("supertest")
 expect = require("chai").expect
 urlencode = require("urlencode")
 
+context = require('../lib/context')
+
 app = undefined
 db = undefined
+graphdb = undefined
 # group = undefined 
 
 group =
@@ -30,25 +33,33 @@ bestGroup =
 describe "#groups", ->
   before ->
     db = require("level-test")()("testdb")
+    graphdb = require('levelgraph-jsonld')(require('levelgraph')(db))
     app = require('../')(db)
     request = request(app)
     return
 
   it "should POST /groups", (done) ->
+    body = undefined
+
     request
     .post("/groups")
     .send(group)
     .expect("Content-Type", /json/)
-    .expect(201).expect((req) ->
-      body = req.body
+    .expect(201)
+    .expect (req) ->
       ## why is it an array?
-      expect(body[0]).to.have.property "@type", "foaf:group"
+      body = req.body[0]
+      expect(body).to.have.property "@type", "foaf:group"
       for prop of body
-        expect(body).to.have.property prop, body[prop]
-      return)
-    .end((err, res) ->
+        expect(body).to.have.property prop, group[prop]
+      return
+    .end (err, res) ->
       return done(err) if err
-      done())
+      graphdb.jsonld.get body.id, context, (err, body) ->
+        return done(err) if err
+        for prop of body
+          expect(body).to.have.property prop, group[prop]
+        done()
 
   it "should GET /groups", (done) ->
     request
