@@ -14,11 +14,11 @@ expandSimpleQuery = (query, context, callback) ->
     .map((doc) -> expand(doc))
     .then(extractPredicateAndObject)
     .then((expanded) -> 
-      simpleQuery =
+      return {
         subject: db.v('id')
         predicate: expanded.predicate
         object: expanded.object
+      })
+    .nodeify(callback)
 
-      callback(null, simpleQuery))
-
-module.exports = Promise.promisify expandSimpleQuery
+module.exports = expandSimpleQuery

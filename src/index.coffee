@@ -13,10 +13,9 @@ context = require "./context"
 #
 # utility functions
 #
-utils = require "./utils"
-
 compact = Promise.promisify jsonld.compact
 expand = Promise.promisify jsonld.expand
+utils = require "./utils"
 
 # return express app
 module.exports = (db) ->

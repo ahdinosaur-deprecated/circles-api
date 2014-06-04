@@ -12,7 +12,6 @@ expandGroupID = (id, context, callback) ->
     .then((terms) -> addContext(terms[1], context))
     .then(expand)
     .then((expanded) -> getKey(expanded[0]))
-    .then((expandedIRI) -> 
-      callback null, expandedIRI)
+    .nodeify(callback)
 
-module.exports = Promise.promisify expandGroupID
+module.exports = expandGroupID
