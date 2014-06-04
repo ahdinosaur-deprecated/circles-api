@@ -227,7 +227,6 @@ module.exports = (db) ->
       .done(-> 
         res.json 204, null)
 
-
   #TODO doesnt work yet
   app.get "/groups/:id/:subResource", (req, res, next) ->
     id = urlencode.decode req.params.id
