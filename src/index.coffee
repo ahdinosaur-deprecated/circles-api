@@ -100,7 +100,6 @@ module.exports = (db) ->
   # CRUD functions
   #
   find = (query, callback) ->
-    console.log query
     db.search query, (error, groups) ->
       if error
         callback(error)
@@ -116,13 +115,12 @@ module.exports = (db) ->
     data = alias(data, "id", "@id")
     db.jsonld.put data, (error, group) ->
       # if error, return error
-      return callback(err) if error
+      return callback(error) if error
       # return group
       compact(group, context, callback)
 
   get = (id, callback) ->
     db.jsonld.get id, {'@context': context}, (error, group) ->
-      console.log error, group
       if error
         callback error
       else
@@ -144,12 +142,12 @@ module.exports = (db) ->
     # if id in route doesn't match id in data, return 400
     if data["@id"] isnt id
       error = new Error("id in route does not match id in data")
-      err.status = 400
-      return callback(err)
+      error.status = 400
+      return callback(error)
     # put group in database
     db.jsonld.put data, (error, group) ->
       # if error, return error
-      return callback(err) if error
+      return callback(error) if error
       # return group
       compact(group, context, callback)
 
@@ -195,7 +193,6 @@ module.exports = (db) ->
     body = req.body
     create(body, null)
       .then((group) -> 
-        console.log 'group from post', group
         res.json 201,
           group)
     return
@@ -237,8 +234,6 @@ module.exports = (db) ->
         if not group?
           res.json 404, null
         else
-          console.log group, 'get id subResource'
-
           res.json 200, group[subResource])
 
   # return express app
