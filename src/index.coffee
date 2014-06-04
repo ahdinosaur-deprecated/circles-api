@@ -13,16 +13,10 @@ context = require "./context"
 #
 # utility functions
 #
-
-#https://github.com/open-app/people-api/tree/master/src/utils
-alias = require "./utils/alias"
-hasType = require "./utils/hasType"
-expansion = require "./utils/expansion"
-
+utils = require "./utils"
 
 compact = Promise.promisify jsonld.compact
 expand = Promise.promisify jsonld.expand
-
 
 # return express app
 module.exports = (db) ->
@@ -48,11 +42,11 @@ module.exports = (db) ->
 
   create = (data, params, callback) ->
     # alias type to @type
-    data = alias(data, "type", "@type")
+    data = utils.alias(data, "type", "@type")
     # ensure @type has "foaf:Person"
-    data = hasType(data, "foaf:group")
+    data = utils.hasType(data, "foaf:group")
     # alias id to @id
-    data = alias(data, "id", "@id")
+    data = utils.alias(data, "id", "@id")
     db.jsonld.put data, (error, group) ->
       # if error, return error
       return callback(error) if error
@@ -74,11 +68,11 @@ module.exports = (db) ->
 
   update = (id, data, params, callback) ->
     # alias type to @type
-    data = alias(data, "type", "@type")
+    data = utils.alias(data, "type", "@type")
     # ensure @type has "foaf:Person"
-    data = hasType(data, "foaf:group")
+    data = utils.hasType(data, "foaf:group")
     # alias id to @id
-    data = alias(data, "id", "@id")
+    data = utils.alias(data, "id", "@id")
     # if id in route doesn't match id in data, return 400
     if data["@id"] isnt id
       error = new Error("id in route does not match id in data")
@@ -124,7 +118,7 @@ module.exports = (db) ->
       res.json 400, "GET /groups? only accepts 1 parameter key-value pair"
       return
     else
-      expansion.expandSimpleQuery(query, context)
+      utils.expandSimpleQuery(query, context)
         .then(find)
         .then((groups) ->
           res.json 200, groups)
@@ -139,7 +133,7 @@ module.exports = (db) ->
 
   app.get "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
-    expansion.expandGroupID(id, context)
+    utils.expandGroupID(id, context)
       .then(get)
       .then((group) ->
         if not group?
@@ -151,7 +145,7 @@ module.exports = (db) ->
   app.put "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
     body = req.body
-    expansion.expandGroupID(id, context)
+    utils.expandGroupID(id, context)
       .then((expandedIRI) -> update(expandedIRI, body, null))
       .then((group) ->
         res.json 200, group)
@@ -159,7 +153,7 @@ module.exports = (db) ->
 
   app.delete "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
-    expansion.expandGroupID(id, context)
+    utils.expandGroupID(id, context)
       .then((expandedIRI) -> remove(expandedIRI, null))
       .done(-> 
         res.json 204, null)
@@ -168,7 +162,7 @@ module.exports = (db) ->
   app.get "/groups/:id/:subResource", (req, res, next) ->
     id = urlencode.decode req.params.id
     subResource = req.params.subResource
-    expansion.expandGroupID(id, context)
+    utils.expandGroupID(id, context)
       .then(get)
       .then((group) ->
         if not group?
