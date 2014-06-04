@@ -17,72 +17,12 @@ context = require "./context"
 #https://github.com/open-app/people-api/tree/master/src/utils
 alias = require "./utils/alias"
 hasType = require "./utils/hasType"
+expansion = require "./utils/expansion"
 
-addContext = (term, context, callback) ->
-  doc = {}
-  doc[term] = term
-  doc['@context'] = context
-  callback(null, doc)
 
-addDefaultPrefix = (terms, context, callback) ->
-  if validator.isURL terms[1]
-    callback null, terms
-  else if terms[1].indexOf(':') is -1
-    prefix = context[terms[0]]["defaultPrefix"]
-    terms[1] = prefix + ":" + terms[1]
-    callback null, terms
-  else
-    callback null, terms
-
-expandGroupID = (id, context, callback) ->
-  terms = ["group", id]
-  addDefaultPrefix(terms, context)
-    .then((terms) -> addContext(terms[1], context))
-    .then(expand)
-    .then((expanded) -> getKey(expanded[0]))
-    .then((expandedIRI) -> 
-      callback null, expandedIRI)
-
-expandSimpleQuery = (query, context, callback) ->
-  pair(query)
-    .then((terms) -> addDefaultPrefix(terms, context))
-    .map((term) -> addContext(term, context))
-    .map((doc) -> expand(doc))
-    .then(extractPredicateAndObject)
-    .then((expanded) -> 
-      simpleQuery =
-        subject: db.v('@id')
-        predicate: expanded.predicate
-        object: expanded.object
-
-      callback(null, simpleQuery))
-
-extractPredicateAndObject = (terms, callback) ->
-  expanded =
-    predicate: Object.keys(terms[0][0])[0]
-    object: Object.keys(terms[1][0])[0]
-  callback(null, expanded)
-
-getKey = (obj, callback) ->
-  key = Object.keys(obj)[0]
-  callback null, key
-
-pair = (obj, callback) ->
-  key = Object.keys(obj)[0]
-  value = obj[key]
-  terms = [key, value]
-  callback null, terms
-
-#promisfy utility functions
-addContext = Promise.promisify addContext
-addDefaultPrefix = Promise.promisify addDefaultPrefix
 compact = Promise.promisify jsonld.compact
 expand = Promise.promisify jsonld.expand
-expandGroupID = Promise.promisify expandGroupID
-expandSimpleQuery = Promise.promisify expandSimpleQuery 
-extractPredicateAndObject = Promise.promisify extractPredicateAndObject
-getKey = Promise.promisify getKey
-pair = Promise.promisify pair
+
 
 # return express app
 module.exports = (db) ->
@@ -186,7 +126,7 @@ module.exports = (db) ->
       res.json 400, "GET /groups? only accepts 1 parameter key-value pair"
       return
     else
-      expandSimpleQuery(query, context)
+      expansion.expandSimpleQuery(query, context)
         .then(find)
         .then((groups) ->
           res.json 200, groups)
@@ -202,7 +142,7 @@ module.exports = (db) ->
 
   app.get "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
-    expandGroupID(id, context)
+    expansion.expandGroupID(id, context)
       .then(get)
       .then((group) ->
         if not group?
@@ -214,7 +154,7 @@ module.exports = (db) ->
   app.put "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
     body = req.body
-    expandGroupID(id, context)
+    expansion.expandGroupID(id, context)
       .then((expandedIRI) -> update(expandedIRI, body, null))
       .then((group) ->
         res.json 200, group)
@@ -222,7 +162,7 @@ module.exports = (db) ->
 
   app.delete "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
-    expandGroupID(id, context)
+    expansion.expandGroupID(id, context)
       .then((expandedIRI) -> remove(expandedIRI, null))
       .done(-> 
         res.json 204, null)
@@ -231,7 +171,7 @@ module.exports = (db) ->
   app.get "/groups/:id/:subResource", (req, res, next) ->
     id = urlencode.decode req.params.id
     subResource = req.params.subResource
-    expandGroupID(id, context)
+    expansion.expandGroupID(id, context)
       .then(get)
       .then((group) ->
         if not group?
