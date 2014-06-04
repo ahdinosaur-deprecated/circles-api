@@ -20,7 +20,7 @@ npm install
 ### run
 
 ```bash
-node .
+npm start
 ```
 
 ### develop
