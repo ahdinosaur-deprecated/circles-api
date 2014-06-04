@@ -132,7 +132,7 @@ module.exports = (db) ->
 
   app.get "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
-    utils.expandGroupID(id, context)
+    utils.defaultID(id, context)
       .then(get)
       .then((group) ->
         if not group?
@@ -144,7 +144,7 @@ module.exports = (db) ->
   app.put "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
     body = req.body
-    utils.expandGroupID(id, context)
+    utils.defaultID(id, context)
       .then((expandedIRI) -> update(expandedIRI, body, null))
       .then((group) ->
         res.json 200, group)
@@ -152,7 +152,7 @@ module.exports = (db) ->
 
   app.delete "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
-    utils.expandGroupID(id, context)
+    utils.defaultID(id, context)
       .then((expandedIRI) -> remove(expandedIRI, null))
       .done(-> 
         res.json 204, null)
@@ -161,7 +161,7 @@ module.exports = (db) ->
   app.get "/groups/:id/:subResource", (req, res, next) ->
     id = urlencode.decode req.params.id
     subResource = req.params.subResource
-    utils.expandGroupID(id, context)
+    utils.defaultID(id, context)
       .then(get)
       .then((group) ->
         if not group?
