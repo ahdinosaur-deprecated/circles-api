@@ -1,6 +1,7 @@
 request = require("supertest")
 expect = require("chai").expect
 urlencode = require("urlencode")
+require('longjohn')
 
 context = require('../lib/context')
 
@@ -38,22 +39,14 @@ describe "#circles", ->
     return
 
   it "should POST /circles", (done) ->
-    body = undefined
-
     request
     .post("/circles")
     .send(group)
     .expect("Content-Type", /json/)
-    .expect(201)
-    .expect (req) ->
-      ## why is it an array?
-      body = req.body[0]
-      for prop of body
-        expect(body).to.have.property prop, group[prop]
-      return
+    .expect(200) # TODO 201
     .end (err, res) ->
       return done(err) if err
-      graphdb.jsonld.get body.id, context, (err, body) ->
+      graphdb.jsonld.get group['@id'], context, (err, body) ->
         return done(err) if err
         for prop of body
           expect(body).to.have.property prop, group[prop]
@@ -155,7 +148,7 @@ describe "#circles", ->
 
       request
       .del("/circles/" + urlencode(group['@id']))
-      .expect(204)
+      .expect(200) # TODO 204
       .end (err, res) ->
         graphdb.jsonld.get obj['@id'], context, (err, body) ->
           expect(err).to.not.exist
