@@ -9,6 +9,7 @@ _ = Promise.promisifyAll(require("lodash"))
 
 initData = require "./initData"
 context = require "./context"
+config = require('./config')
 
 #
 # utility functions
@@ -40,12 +41,9 @@ module.exports = (db) ->
         callback(null, groups)
 
   create = (data, params, callback) ->
-    # alias type to @type
-    data = utils.alias(data, "type", "@type")
-    # ensure @type has "foaf:Person"
-    data = utils.hasType(data, "foaf:group")
-    # alias id to @id
-    data = utils.alias(data, "id", "@id")
+    # normalize data
+    data = utils.normalizeData(config, data)
+    # put group in database
     db.jsonld.put data, (error, group) ->
       # if error, return error
       return callback(error) if error
@@ -53,6 +51,9 @@ module.exports = (db) ->
       compact(group, context, callback)
 
   get = (id, callback) ->
+    # normalize id
+    id = utils.normalizeID(config, id)
+    # get group from database
     db.jsonld.get id, {'@context': context}, (error, group) ->
       if error
         callback error
@@ -66,15 +67,9 @@ module.exports = (db) ->
         message: 'ok' 
 
   update = (id, data, params, callback) ->
-    # alias type to @type
-    data = utils.alias(data, "type", "@type")
-    # ensure @type has "foaf:Person"
-    data = utils.hasType(data, "foaf:group")
-    # alias id to @id
-    data = utils.alias(data, "id", "@id")
-    # default id
-    id = utils.defaultID id
-    data["@id"] = utils.defaultID data["@id"]
+    # normalize id and data
+    id = utils.normalizeID(config, id)
+    data = utils.normalizeData(config, data)
     # if id in route doesn't match id in data, return 400
     if data["@id"] isnt id
       error = new Error("id in route does not match id in data")
@@ -88,8 +83,8 @@ module.exports = (db) ->
       compact(group, context, callback)
 
   remove = (id, params, callback) ->
-    # default id
-    id = utils.defaultID id
+    # normalize id
+    id = utils.normalizeID(config, id)
     # delete group in database
     db.jsonld.del id, (error) ->
       return callback error if error
@@ -113,7 +108,7 @@ module.exports = (db) ->
       defaultQuery =
         subject: db.v('@id')
         predicate: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-        object: "foaf:group"
+        object: config.entity.type
 
       find(defaultQuery)
         .then((groups) ->
@@ -138,7 +133,6 @@ module.exports = (db) ->
 
   app.get "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
-    id = utils.defaultID id
     get(id)
       .then((group) ->
         if not group?
@@ -165,7 +159,6 @@ module.exports = (db) ->
   app.get "/groups/:id/:subResource", (req, res, next) ->
     id = urlencode.decode req.params.id
     subResource = req.params.subResource
-    id = utils.defaultID id
     get(id)
       .then(get)
       .then((group) ->

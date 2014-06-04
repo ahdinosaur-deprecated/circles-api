@@ -3,13 +3,11 @@ Url = require('url')
 Promise = require('bluebird')
 validator = require('validator')
 
-config = require('../config')
-
-defaultID = (id) ->
+defaultID = (urlObj, id) ->
   if validator.isURL(id)
     return id
   else
-    urlPrefix = Url.format(config)
+    urlPrefix = Url.format(urlObj)
     return urlPrefix + '/' + id
 
 module.exports = defaultID

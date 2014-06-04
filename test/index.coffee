@@ -11,7 +11,7 @@ graphdb = undefined
 
 group =
   '@id': "http://open.app/circles/loomiocommunity"
-  '@type': "foaf:group"
+  '@type': "foaf:Group"
   name: "Loomio Community"
   members: [
     {

@@ -16,7 +16,7 @@ module.exports =
   #properties
   description: "schema:description"
   group: 
-    "@id": "foaf:group"
+    "@id": "foaf:Group"
     "defaultPrefix": "circles"
   image: "foaf:Image"
   name: "foaf:name"
