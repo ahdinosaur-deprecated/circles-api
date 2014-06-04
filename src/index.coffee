@@ -34,11 +34,11 @@ module.exports = (db) ->
   # CRUD functions
   #
   find = (query, callback) ->
-    db.search query, (error, groups) ->
+    db.search query, (error, circles) ->
       if error
         callback(error)
       else
-        callback(null, groups)
+        callback(null, circles)
 
   create = (data, params, callback) ->
     # normalize data
@@ -101,7 +101,7 @@ module.exports = (db) ->
   #
   # routes
   #
-  app.get "/groups", (req, res, next) ->
+  app.get "/circles", (req, res, next) ->
     query = req.query
     keys = Object.keys(query)
     if keys.length is 0
@@ -111,19 +111,19 @@ module.exports = (db) ->
         object: config.entity.type
 
       find(defaultQuery)
-        .then((groups) ->
-          res.json 200, groups)
+        .then((circles) ->
+          res.json 200, circles)
       return
     else if keys.length > 1
-      res.json 400, "GET /groups? only accepts 1 parameter key-value pair"
+      res.json 400, "GET /circles? only accepts 1 parameter key-value pair"
       return
     else
       utils.expandSimpleQuery(query, context)
         .then(find)
-        .then((groups) ->
-          res.json 200, groups)
+        .then((circles) ->
+          res.json 200, circles)
 
-  app.post "/groups", (req, res, next) ->
+  app.post "/circles", (req, res, next) ->
     body = req.body
     create(body, null)
       .then((group) -> 
@@ -131,7 +131,7 @@ module.exports = (db) ->
           group)
     return
 
-  app.get "/groups/:id", (req, res, next) ->
+  app.get "/circles/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
     get(id)
       .then((group) ->
@@ -141,7 +141,7 @@ module.exports = (db) ->
           res.json 200, group)
     return
 
-  app.put "/groups/:id", (req, res, next) ->
+  app.put "/circles/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
     body = req.body
     update(id, body, null)
@@ -149,14 +149,14 @@ module.exports = (db) ->
         res.json 200, group)
     return
 
-  app.delete "/groups/:id", (req, res, next) ->
+  app.delete "/circles/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
     remove(id, null)
       .done(-> 
         res.json 204, null)
 
   #TODO doesnt work yet
-  app.get "/groups/:id/:subResource", (req, res, next) ->
+  app.get "/circles/:id/:subResource", (req, res, next) ->
     id = urlencode.decode req.params.id
     subResource = req.params.subResource
     get(id)

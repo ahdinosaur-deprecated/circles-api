@@ -29,7 +29,7 @@ bestGroup =
   id: "http://circles.app.enspiral.com/bestgroup"
   name: "Best Group"
 
-describe "#groups", ->
+describe "#circles", ->
   before ->
     db = require("level-test")()("testdb")
     graphdb = require('levelgraph-jsonld')(require('levelgraph')(db))
@@ -37,11 +37,11 @@ describe "#groups", ->
     request = request(app)
     return
 
-  it "should POST /groups", (done) ->
+  it "should POST /circles", (done) ->
     body = undefined
 
     request
-    .post("/groups")
+    .post("/circles")
     .send(group)
     .expect("Content-Type", /json/)
     .expect(201)
@@ -59,13 +59,13 @@ describe "#groups", ->
           expect(body).to.have.property prop, group[prop]
         done()
 
-  it "should GET /groups", (done) ->
+  it "should GET /circles", (done) ->
 
     graphdb.jsonld.put group, (err) ->
       expect(err).to.not.exist
 
       request
-      .get("/groups")
+      .get("/circles")
       .expect("Content-Type", /json/)
       .expect(200)
       .expect (req) ->
@@ -78,12 +78,12 @@ describe "#groups", ->
         return done(err) if err
         done()
 
-  it "should GET /groups/:id", (done) ->
+  it "should GET /circles/:id", (done) ->
       graphdb.jsonld.put group, (err, obj) ->
         expect(err).to.not.exist
 
         request
-        .get("/groups/" + urlencode(obj['@id']))
+        .get("/circles/" + urlencode(obj['@id']))
         .expect("Content-Type", /json/)
         .expect(200)
         .expect((req) ->
@@ -95,12 +95,12 @@ describe "#groups", ->
           return done(err)  if err
           done())
 
-  it "should GET /groups/:shortID", (done) ->
+  it "should GET /circles/:shortID", (done) ->
     graphdb.jsonld.put group, (err, obj) ->
         expect(err).to.not.exist
 
         request
-        .get("/groups/" + urlencode('loomiocommunity'))
+        .get("/circles/" + urlencode('loomiocommunity'))
         .expect("Content-Type", /json/)
         .expect(200)
         .expect((req) ->
@@ -112,11 +112,11 @@ describe "#groups", ->
           return done(err)  if err
           done())
 
-  it "should PUT /groups/:id", (done) ->
+  it "should PUT /circles/:id", (done) ->
     body = undefined
 
     request
-    .put("/groups/" + urlencode(group['@id']))
+    .put("/circles/" + urlencode(group['@id']))
     .send(group)
     .expect("Content-Type", /json/)
     .expect(200)
@@ -133,9 +133,9 @@ describe "#groups", ->
         done()
 
   #TODO
-#  it "should GET /groups/:id/members", (done) ->
+#  it "should GET /circles/:id/members", (done) ->
 #    request
-#    .get("/groups/" + urlencode(group['@id']) + "/members")
+#    .get("/circles/" + urlencode(group['@id']) + "/members")
 #    .expect("Content-Type", /json/)
 #    .expect(200)
 #    .expect((req) ->
@@ -147,14 +147,14 @@ describe "#groups", ->
 #      return done(err)  if err
 #      done())
 
-  it "should DELETE /groups/:id", (done) ->
+  it "should DELETE /circles/:id", (done) ->
 
     graphdb.jsonld.put group, (err, obj) ->
       expect(err).to.not.exist
       expect(obj).to.exist
 
       request
-      .del("/groups/" + urlencode(group['@id']))
+      .del("/circles/" + urlencode(group['@id']))
       .expect(204)
       .end (err, res) ->
         graphdb.jsonld.get obj['@id'], context, (err, body) ->
