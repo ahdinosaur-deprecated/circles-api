@@ -17,17 +17,16 @@
   graphdb = void 0;
 
   group = {
-    id: "http://circles.app.enspiral.com/loomiocommunity",
+    '@id': "http://circles.app.enspiral.com/loomiocommunity",
+    '@type': "foaf:group",
     prefixID: "circles:loomiocommunity",
     shortID: "loomiocommunity",
     name: "Loomio Community",
     members: [
       {
-        "@id": "people:aaronthornton",
-        name: "Aaron Thornton"
+        "@id": "people:aaronthornton"
       }, {
-        "@id": "people:simontegg",
-        name: "Simon Tegg"
+        "@id": "people:simontegg"
       }
     ]
   };
@@ -50,7 +49,8 @@
       return request.post("/groups").send(group).expect("Content-Type", /json/).expect(201).expect(function(req) {
         var prop;
         body = req.body[0];
-        expect(body).to.have.property("@type", "foaf:group");
+        expect(body['@id']).to.equal("circles:loomiocommunity");
+        delete body['@id'];
         for (prop in body) {
           expect(body).to.have.property(prop, group[prop]);
         }
@@ -71,93 +71,107 @@
       });
     });
     it("should GET /groups", function(done) {
-      return request.get("/groups").expect("Content-Type", /json/).expect(200).expect(function(req) {
-        var body, prop;
-        body = req.body;
-        for (prop in body[0]) {
-          expect(body[0]).to.have.property(prop, body[0][prop]);
-        }
-      }).end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        return done();
+      return graphdb.jsonld.put(group, function(err) {
+        expect(err).to.not.exist;
+        return request.get("/groups").expect("Content-Type", /json/).expect(200).expect(function(req) {
+          var body, prop;
+          body = req.body;
+          expect(body).to.have.length(1);
+          for (prop in body[0]) {
+            expect(body[0]).to.have.property(prop, body[0][prop]);
+          }
+        }).end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+          return done();
+        });
       });
     });
     it("should GET /groups/:id", function(done) {
-      return request.get("/groups/" + urlencode(group.id)).expect("Content-Type", /json/).expect(200).expect(function(req) {
-        var body, prop;
-        body = req.body;
-        expect(body).to.have.property("@type", "foaf:group");
-        for (prop in body) {
-          expect(body).to.have.property(prop, body[prop]);
-        }
-      }).end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        return done();
+      return graphdb.jsonld.put(group, function(err, obj) {
+        expect(err).to.not.exist;
+        return request.get("/groups/" + urlencode(obj['@id'])).expect("Content-Type", /json/).expect(200).expect(function(req) {
+          var body, prop;
+          body = req.body;
+          for (prop in body) {
+            expect(body).to.have.property(prop, body[prop]);
+          }
+        }).end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+          return done();
+        });
       });
     });
     it("should GET /groups/:prefix:id", function(done) {
-      return request.get("/groups/" + urlencode(group.prefixID)).expect("Content-Type", /json/).expect(200).expect(function(req) {
-        var body, prop;
-        body = req.body;
-        expect(body).to.have.property("@type", "foaf:group");
-        for (prop in body) {
-          expect(body).to.have.property(prop, body[prop]);
-        }
-      }).end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        return done();
+      return graphdb.jsonld.put(group, function(err, obj) {
+        expect(err).to.not.exist;
+        return request.get("/groups/" + urlencode(obj['prefixID'])).expect("Content-Type", /json/).expect(200).expect(function(req) {
+          var body, prop;
+          body = req.body;
+          for (prop in body) {
+            expect(body).to.have.property(prop, body[prop]);
+          }
+        }).end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+          return done();
+        });
       });
     });
     it("should GET /groups/:shortID", function(done) {
-      return request.get("/groups/" + urlencode(group.shortID)).expect("Content-Type", /json/).expect(200).expect(function(req) {
-        var body, prop;
-        body = req.body;
-        expect(body).to.have.property("@type", "foaf:group");
-        for (prop in body) {
-          expect(body).to.have.property(prop, body[prop]);
-        }
-      }).end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        return done();
+      return graphdb.jsonld.put(group, function(err, obj) {
+        expect(err).to.not.exist;
+        return request.get("/groups/" + urlencode(obj['shortID'])).expect("Content-Type", /json/).expect(200).expect(function(req) {
+          var body, prop;
+          body = req.body;
+          for (prop in body) {
+            expect(body).to.have.property(prop, body[prop]);
+          }
+        }).end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+          return done();
+        });
       });
     });
     it("should PUT /groups/:id", function(done) {
-      return request.put("/groups/" + urlencode(group.id)).send(group).expect("Content-Type", /json/).expect(200).expect(function(req) {
-        var body, prop;
+      var body;
+      body = void 0;
+      return request.put("/groups/" + urlencode(group['@id'])).send(group).expect("Content-Type", /json/).expect(200).expect(function(req) {
+        var prop;
         body = req.body;
-        expect(body[0]).to.have.property("@type", "foaf:group");
         for (prop in body) {
           expect(body).to.have.property(prop, body[prop]);
         }
       }).end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        return done();
+        return graphdb.jsonld.get(body.id, context, function(err, body) {
+          var prop;
+          if (err) {
+            return done(err);
+          }
+          for (prop in body) {
+            expect(body).to.have.property(prop, group[prop]);
+          }
+          return done();
+        });
       });
     });
     it("should DELETE /groups/:id", function(done) {
-      return request.del("/groups/" + urlencode(group.id)).expect(204).end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        return done();
-      });
-    });
-    it("should not GET deleted id", function(done) {
-      return request.get("/groups/" + urlencode(group.id)).expect("Content-Type", /json/).expect(404).end(function(err, res) {
-        if (err) {
-          return done(err);
-        }
-        return done();
+      return graphdb.jsonld.put(group, function(err, obj) {
+        expect(err).to.not.exist;
+        expect(obj).to.exist;
+        return request.del("/groups/" + urlencode(group['@id'])).expect(204).end(function(err, res) {
+          return graphdb.jsonld.get(obj['@id'], context, function(err, body) {
+            expect(err).to.not.exist;
+            expect(body).to.not.exist;
+            return done();
+          });
+        });
       });
     });
     afterEach(function(done) {
