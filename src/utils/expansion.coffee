@@ -32,7 +32,7 @@ expandSimpleQuery = (query, context, callback) ->
     .then((terms) -> expansion.addDefaultPrefix(terms, context))
     .map((term) -> expansion.addContext(term, context))
     .map((doc) -> expand(doc))
-    .then(expandsion.extractPredicateAndObject)
+    .then(expansion.extractPredicateAndObject)
     .then((expanded) -> 
       simpleQuery =
         subject: db.v('id')
