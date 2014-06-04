@@ -72,6 +72,9 @@ module.exports = (db) ->
     data = utils.hasType(data, "foaf:group")
     # alias id to @id
     data = utils.alias(data, "id", "@id")
+    # default id
+    id = utils.defaultID id
+    data["@id"] = utils.defaultID data["@id"]
     # if id in route doesn't match id in data, return 400
     if data["@id"] isnt id
       error = new Error("id in route does not match id in data")
@@ -85,6 +88,9 @@ module.exports = (db) ->
       compact(group, context, callback)
 
   remove = (id, params, callback) ->
+    # default id
+    id = utils.defaultID id
+    # delete group in database
     db.jsonld.del id, (error) ->
       return callback error if error
       callback null
@@ -132,8 +138,8 @@ module.exports = (db) ->
 
   app.get "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
-    utils.defaultID(id, context)
-      .then(get)
+    id = utils.defaultID id
+    get(id)
       .then((group) ->
         if not group?
           res.json 404, null
@@ -144,16 +150,14 @@ module.exports = (db) ->
   app.put "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
     body = req.body
-    utils.defaultID(id, context)
-      .then((expandedIRI) -> update(expandedIRI, body, null))
+    update(id, body, null)
       .then((group) ->
         res.json 200, group)
     return
 
   app.delete "/groups/:id", (req, res, next) ->
     id = urlencode.decode req.params.id
-    utils.defaultID(id, context)
-      .then((expandedIRI) -> remove(expandedIRI, null))
+    remove(id, null)
       .done(-> 
         res.json 204, null)
 
@@ -161,7 +165,8 @@ module.exports = (db) ->
   app.get "/groups/:id/:subResource", (req, res, next) ->
     id = urlencode.decode req.params.id
     subResource = req.params.subResource
-    utils.defaultID(id, context)
+    id = utils.defaultID id
+    get(id)
       .then(get)
       .then((group) ->
         if not group?

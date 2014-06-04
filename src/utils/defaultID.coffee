@@ -1,11 +1,15 @@
+Url = require('url')
+
 Promise = require('bluebird')
 validator = require('validator')
 
-defaultID = (id, context, callback) ->
-  if validator.isURL(id)
-    callback(null, id)
-  else
-    idPrefix = "http://open.app/circles/"
-    callback(null, idPrefix + id)
+config = require('../config')
 
-module.exports = Promise.promisify(defaultID)
+defaultID = (id) ->
+  if validator.isURL(id)
+    return id
+  else
+    urlPrefix = Url.format(config)
+    return urlPrefix + '/' + id
+
+module.exports = defaultID
