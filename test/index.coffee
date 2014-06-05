@@ -10,10 +10,8 @@ graphdb = undefined
 # group = undefined 
 
 group =
-  '@id': "http://circles.app.enspiral.com/loomiocommunity"
+  '@id': "http://open.app/circles/loomiocommunity"
   '@type': "foaf:group"
-  prefixID: "circles:loomiocommunity"
-  shortID: "loomiocommunity"
   name: "Loomio Community"
   members: [
     {
@@ -50,10 +48,6 @@ describe "#groups", ->
     .expect (req) ->
       ## why is it an array?
       body = req.body[0]
-      # check id
-      expect(body['@id']).to.equal("circles:loomiocommunity")
-      # check all other props
-      delete body['@id']
       for prop of body
         expect(body).to.have.property prop, group[prop]
       return
@@ -78,7 +72,7 @@ describe "#groups", ->
         body = req.body
         expect(body).to.have.length(1)
         for prop of body[0]
-          expect(body[0]).to.have.property prop, body[0][prop]
+          expect(body[0]).to.have.property prop, group[prop]
         return
       .end (err, res) ->
         return done(err) if err
@@ -89,30 +83,13 @@ describe "#groups", ->
         expect(err).to.not.exist
 
         request
-        .get("/groups/" + urlencode(obj['@id']) ) #'loomiocommunity')
+        .get("/groups/" + urlencode(obj['@id']))
         .expect("Content-Type", /json/)
         .expect(200)
         .expect((req) ->
           body = req.body
           for prop of body
-            expect(body).to.have.property prop, body[prop]
-          return)
-        .end((err, res) ->
-          return done(err)  if err
-          done())
-
-  it "should GET /groups/:prefix:id", (done) ->
-    graphdb.jsonld.put group, (err, obj) ->
-        expect(err).to.not.exist
-
-        request
-        .get("/groups/" + urlencode(obj['prefixID']) ) #'loomiocommunity')
-        .expect("Content-Type", /json/)
-        .expect(200)
-        .expect((req) ->
-          body = req.body
-          for prop of body
-            expect(body).to.have.property prop, body[prop]
+            expect(body).to.have.property prop, group[prop]
           return)
         .end((err, res) ->
           return done(err)  if err
@@ -123,13 +100,13 @@ describe "#groups", ->
         expect(err).to.not.exist
 
         request
-        .get("/groups/" + urlencode(obj['shortID']) ) #'loomiocommunity')
+        .get("/groups/" + urlencode('loomiocommunity'))
         .expect("Content-Type", /json/)
         .expect(200)
         .expect((req) ->
           body = req.body
           for prop of body
-            expect(body).to.have.property prop, body[prop]
+            expect(body).to.have.property prop, group[prop]
           return)
         .end((err, res) ->
           return done(err)  if err
@@ -146,7 +123,7 @@ describe "#groups", ->
     .expect((req) ->
       body = req.body
       for prop of body
-        expect(body).to.have.property prop, body[prop]
+        expect(body).to.have.property prop, group[prop]
       return)
     .end (err, res) ->
       graphdb.jsonld.get body.id, context, (err, body) ->
