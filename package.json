@@ -1,7 +1,7 @@
 {
   "name": "open-app-circles-api",
   "version": "0.1.0",
-  "description": "circles API of Open App Ecosystem",
+  "description": "Circles API of Open App Ecosystem",
   "main": "lib/index.js",
   "scripts": {
     "build": "coffee -o lib -c src",
