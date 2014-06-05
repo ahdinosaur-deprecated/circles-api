@@ -1,7 +1,7 @@
 {
-  "name": "circles.open.app",
-  "version": "0.0.0",
-  "description": "circles app of open app ecosystem",
+  "name": "open-app-circles-api",
+  "version": "0.1.0",
+  "description": "circles API of Open App Ecosystem",
   "main": "lib/index.js",
   "scripts": {
     "build": "coffee -o lib -c src",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ahdinosaur/circles.open.app.git"
+    "url": "git://github.com/open-app/circles-api.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "open-app",
+  "license": "AGPLv3",
   "bugs": {
-    "url": "https://github.com/ahdinosaur/circles.open.app/issues"
+    "url": "https://github.com/open-app/circles-api/issues"
   },
-  "homepage": "https://github.com/ahdinosaur/circles.open.app",
+  "homepage": "https://github.com/open-app/circles-api",
   "dependencies": {
     "bluebird": "^1.2.4",
     "body-parser": "~1.2.0",

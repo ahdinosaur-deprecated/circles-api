@@ -35,3 +35,7 @@ npm run develop
 ```bash
 npm test
 ```
+
+## license
+
+[AGPLv3](LICENSE)
