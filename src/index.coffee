@@ -1,4 +1,5 @@
 feathers = require('feathers')
+associations = require('feathers-associations')
 
 config = require('./config')
 
@@ -13,5 +14,5 @@ module.exports = (db) ->
   # services
   #
   .use(config.url.pathname, require('./service')(db))
-
-  app
+  .use('/people', require('open-app-people-api/lib/service')(db))
+  .associate('/circles/:circleID/members', ['people'])
