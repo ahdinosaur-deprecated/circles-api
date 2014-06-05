@@ -14,4 +14,4 @@ describe "expand", ->
 
   	result = expand(query)
 
-  	expect(result).to.equal(expanded)
+  	expect(result).to.deep.equal(expanded)
