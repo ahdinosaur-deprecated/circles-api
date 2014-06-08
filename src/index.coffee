@@ -5,6 +5,7 @@ config = require('./config')
 # return feathers app
 module.exports = (db) ->
   app = feathers()
+  .configure(feathers.rest())
   #
   # middleware
   #

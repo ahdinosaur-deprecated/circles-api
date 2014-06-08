@@ -43,7 +43,7 @@ describe "#circles", ->
     .post("/circles")
     .send(group)
     .expect("Content-Type", /json/)
-    .expect(200) # TODO 201
+    .expect(201)
     .end (err, res) ->
       return done(err) if err
       graphdb.jsonld.get group['@id'], context, (err, body) ->
