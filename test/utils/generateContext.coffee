@@ -12,9 +12,9 @@ describe "generate context", ->
         "@type":  "http://tools.ietf.org/html/rfc3987"
 
       # prefixes
-      circles: "http://open.app.com/circles"
+      circles: "http://open.app/circles"
       foaf: "http://xmlns.com/foaf/0.1/"
-      relations: "http://open.app.com/relations/"
+      relations: "http://open.app/relations/"
       schema: "https://schema.org/"
 
       #properties

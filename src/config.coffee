@@ -17,14 +17,14 @@ Agent =
   type: "foaf:Agent"
 
 module.exports = 
-  entity: 
+  entity:
     prefixes: [
       {
         id: "http://xmlns.com/foaf/0.1/",
         key: "foaf"
       },
       {
-        id: "http://open.app.com/relations/"
+        id: "http://open.app/relations/"
         key: "relations"
       },
       {
@@ -44,7 +44,7 @@ module.exports =
         schema: Joi.string().alphanum().optional()
       },
       {
-        id: "relations:member",
+        id: "relations:members",
         key: "members"
         schema: Joi.array().optional(),
         type: Agent
