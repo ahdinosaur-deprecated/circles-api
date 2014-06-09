@@ -24,7 +24,7 @@ module.exports =
         key: "foaf"
       },
       {
-        id: "http://open.app/relations/"
+        id: "http://open.app.com/relations/"
         key: "relations"
       },
       {
