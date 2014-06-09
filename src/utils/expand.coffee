@@ -1,6 +1,6 @@
 validator = require "validator"
-expandShorthand = require "../expandShorthand"
-Promise = "bluebird"
+expandShorthand = require "./expandShorthand"
+Promise = require "bluebird"
 
 expand = (term, context, callback) ->
   if validator.isURL term

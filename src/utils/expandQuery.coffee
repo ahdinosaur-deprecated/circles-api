@@ -20,6 +20,8 @@ expandQuery = (queryObj, context, callback) ->
     )
     .nodeify(callback)
 
+module.exports = Promise.promisify expandQuery
+
 
 
 

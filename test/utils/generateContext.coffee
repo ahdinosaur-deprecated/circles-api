@@ -7,7 +7,7 @@ describe "generate context", ->
   it "should generate a json-ld compliant context from a config file", ->
 
     expectedContext =
-      type: 
+      "@type": 
         "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
         "@type":  "http://tools.ietf.org/html/rfc3987"
 
