@@ -14,7 +14,39 @@ Agent =
       schema: Joi.string().alphanum().required()
     }
   ]
-  type: "foaf:Agent"
+  type: 'foaf:Agent'
+
+Person =
+  prefixes: [
+    {
+      id: "http://xmlns.com/foaf/0.1/",
+      key: "foaf"
+    }
+  ]
+  properties: [
+    {
+      id: "foaf:name",
+      key: "name",
+      schema: Joi.string().alphanum().required()
+    }
+  ]
+  type: 'foaf:Person'
+
+Circle =
+  prefixes: [
+    {
+      id: "http://xmlns.com/foaf/0.1/",
+      key: "foaf"
+    }
+  ]
+  properties: [
+    {
+      id: "foaf:name",
+      key: "name",
+      schema: Joi.string().alphanum().required()
+    }
+  ]
+  type: 'foaf:Group'
 
 module.exports = 
   entity:
@@ -47,7 +79,7 @@ module.exports =
         id: "relations:members",
         key: "members"
         schema: Joi.array().optional(),
-        type: Agent
+        type: [Agent, Person, Circle]
 
       }
     ]

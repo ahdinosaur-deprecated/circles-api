@@ -1,5 +1,5 @@
 expect = require('chai').expect
-expand = require '../../lib/utils/expand'
+expandQuery = require '../../lib/utils/expandQuery'
 generateContext = require "../../lib/utils/generateContext"
 config = require '../../lib/config'
 
@@ -8,15 +8,15 @@ generateContext(config)
     describe "expand", ->
       it "should expand a simple REST query into IRIs", ->
         query =
-          "members": "simontegg"
+          "members": "http://open.app/people/simontegg"
 
         expanded =
           predicate: "http://open.app/relations/members"
           object: "http://open.app/people/simontegg"
 
-        result = expand(query, context)
-
-        expect(result).to.deep.equal(expanded))
+        expandQuery(query, context)
+          .then((result) ->
+            expect(result[0]).to.deep.equal(expanded))
 
 
 

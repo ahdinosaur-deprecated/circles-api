@@ -1,6 +1,5 @@
 Url = require('url')
 
-Promise = require('bluebird')
 validator = require('validator')
 
 defaultID = (urlObj, id) ->
