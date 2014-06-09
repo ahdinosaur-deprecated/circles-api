@@ -1,4 +1,5 @@
 Joi = require('joi')
+
 Agent =
   prefixes: [
     {
@@ -13,6 +14,7 @@ Agent =
       schema: Joi.string().alphanum().required()
     }
   ]
+  type: "foaf:agent"
 
 module.exports = 
   entity: 
