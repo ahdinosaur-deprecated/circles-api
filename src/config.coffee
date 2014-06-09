@@ -14,7 +14,7 @@ Agent =
       schema: Joi.string().alphanum().required()
     }
   ]
-  type: "foaf:agent"
+  type: "foaf:Agent"
 
 module.exports = 
   entity: 
@@ -51,7 +51,7 @@ module.exports =
 
       }
     ]
-    type: "foaf:group"
+    type: "foaf:Group"
   url: 
     protocol: "http:"
     host: "open.app"
