@@ -9,7 +9,10 @@
     "build-test": "coffee -c test",
     "start": "npm run build && node server.js",
     "test": "npm run build && npm run build-test && mocha --recursive test",
-    "develop": "npm run build && (nodemon server & npm run watch)"
+    "develop": "npm run build && (nodemon server & npm run watch)",
+    "coverage": "rm -rf coverage; npm run build-test && istanbul cover _mocha -- --recursive --reporter spec --bail",
+    "publish-coverage": "cat coverage/lcov.info | coveralls",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -37,6 +40,8 @@
   "devDependencies": {
     "chai": "~1.9.1",
     "coffee-script": "^1.7.1",
+    "coveralls": "^2.10.0",
+    "istanbul": "^0.2.10",
     "level-test": "^1.6.3",
     "longjohn": "^0.2.4",
     "mocha": "~1.18.2",
