@@ -15,7 +15,6 @@ generateContext(config)
 
         expand(query, context)
           .then((result) ->
-            console.log 'testing expandQuery', result
             expect(result[0]).to.deep.equal(expanded))
     )
 

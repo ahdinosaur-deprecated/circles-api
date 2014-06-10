@@ -24,9 +24,9 @@
     name: "Loomio Community",
     members: [
       {
-        "@id": "people:aaronthornton"
+        "@id": "http://open.app/people/aaronthornton"
       }, {
-        "@id": "people:simontegg"
+        "@id": "http://open.app/people/simontegg"
       }
     ]
   };
@@ -66,6 +66,25 @@
         return request.get("/circles").expect("Content-Type", /json/).expect(200).expect(function(req) {
           var body, prop;
           body = req.body;
+          expect(body).to.have.length(1);
+          for (prop in body[0]) {
+            expect(body[0]).to.have.property(prop, group[prop]);
+          }
+        }).end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+          return done();
+        });
+      });
+    });
+    it("should GET /circles?members=http://open.app/people/simontegg", function(done) {
+      return graphdb.jsonld.put(group, function(err) {
+        expect(err).to.not.exist;
+        return request.get("/circles?members=" + urlencode(group.members[0]["@id"])).expect("Content-Type", /json/).expect(200).expect(function(req) {
+          var body, prop;
+          body = req.body;
+          console.log("query " + urlencode(group.members[0]["@id"]));
           expect(body).to.have.length(1);
           for (prop in body[0]) {
             expect(body[0]).to.have.property(prop, group[prop]);
