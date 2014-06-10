@@ -1,22 +1,29 @@
 validator = require "validator"
 expandShorthand = require "./expandShorthand"
 Promise = require "bluebird"
+jsonld = require "jsonld"
+jsonld = jsonld.promises()
+_ = require "lodash"
 
-expand = (term, context, callback) ->
-  if validator.isURL term
-    callback null, term
-  else if term.indexOf(':') > -1
-    prefix = term.split(':')[0]
-    id = term.split(':')[1]
-    expandShorthand(prefix, id, context)
-      .nodeify(callback)
-  else
-    if context[term]?
-      iri = context[term]
-      callback null, iri
-    else
-      error = new Error "No matching IRI for " + term
-      callback error
+expand = (doc, context, callback) ->
+  doc['@context'] = context
+  console.log doc
+  jsonld.expand(doc)
+    .then ((expandedDoc) ->
+      keys = Object.keys(expandedDoc[0])
+      newDoc = {}
+      Promise
+        .map(keys, (key) ->
+          newDoc[key] = expandedDoc[0][key][0]['@value']
+          return newDoc
+          )
+        .nodeify(callback)
+      return
+      ), (error, expandedDoc) ->
+        callback error
+        return
+  return
+
 
 module.exports = Promise.promisify expand
 

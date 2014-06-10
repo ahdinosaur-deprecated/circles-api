@@ -1,6 +1,8 @@
 Promise = require "bluebird"
 
-expandShorthand = (prefix, id, context, callback) ->
+expandShorthand = (shorthand, context, callback) ->
+  prefix = shorthand.split(':')[0]
+  id = shorthand.split(':')[1]
   if context[prefix]?
     iri = context[prefix] + id
     callback null, iri
