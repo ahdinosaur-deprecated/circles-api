@@ -8,32 +8,46 @@ utils = require('./utils/')
 context = require('./context')
 config = require('./config')
 
+
+queryTest = require('./utils/queryTest')
+expandQuery = require('./utils/expandQuery')
+
 module.exports = service = (db) ->
   # setup levelgraph-jsonld db
   db = levelgraphJsonld(levelgraph(db))
 
   find = (params, callback) ->
     query = (params && params.query) || {}
+    # {}
+    # {member: 'http://open.app/people/simontegg'}
+    # [{member: 'http://open.app/people/simontegg'}]
+    # [{member: 'http://open.app/people/simontegg'}, {based_near: http://www.geonames.org/2179537/wellington.html}]
+    # [{subject: "@@id", predicate: "based_near", object: "http://www.geonames.org/2179537/wellington.html"}]
+    
+    console.log queryTest(query), query
 
-    keys = Object.keys(query)
+    switch queryTest query
+      when "uncompliant_query"
+        expandQuery(query, context)
+          .then((compliantQueries) ->
+            baseQuery =
+              subject: db.v('@id')
+              predicate: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+              object: config.entity.type
 
-    if keys.length is 0
-      defaultQuery =
-        subject: db.v('@id')
-        predicate: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-        object: config.entity.type
-
-      return find({ query: defaultQuery }, callback)
-
+            compliantQueries.push baseQuery
+            return find({ query: compliantQueries }, callback))
+      when "compliant_array"
+        db.search query, (error, circles) ->
+          return callback(error) if error
+          callback(null, circles)
     # TODO simple query eg. GET /circles?member=simontegg
     #  utils.expandSimpleQuery(query, context)
     #    .then(find)
     #    .then((circles) ->
     #      res.json 200, circles)
 
-    db.search query, (error, circles) ->
-      return callback(error) if error
-      callback(null, circles)
+
 
   create = (data, params, callback) ->
     # normalize data

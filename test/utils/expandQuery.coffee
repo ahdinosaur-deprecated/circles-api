@@ -11,6 +11,7 @@ generateContext(config)
           "members": "http://open.app/people/simontegg"
 
         expanded =
+          subject: "@@id"
           predicate: "http://open.app/relations/members"
           object: "http://open.app/people/simontegg"
 

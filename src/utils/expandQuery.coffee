@@ -9,8 +9,11 @@ expandQuery = (queryObj, context, callback) ->
   expand(queryObj, context)
     .map((obj) ->
       key = Object.keys(obj)[0]
+      if not key?
+        return []
       value = obj[key]
       return {
+        subject: "@@id"
         predicate: key
         object: value
       })

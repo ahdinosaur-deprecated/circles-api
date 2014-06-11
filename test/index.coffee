@@ -29,6 +29,14 @@ group =
 bestGroup =
   id: "http://circles.app.enspiral.com/bestgroup"
   name: "Best Group"
+  based_near: "http://www.geonames.org/2179537/wellington.html"
+  members: [
+    {
+      "@id": "http://open.app/people/simontegg"
+    }
+
+
+  ]
 
 describe "#circles", ->
   before ->
@@ -81,7 +89,6 @@ describe "#circles", ->
       .expect(200)
       .expect (req) ->
         body = req.body
-        console.log "query " + urlencode(group.members[1]["@id"])
         expect(body).to.have.length(1)
         for prop of body[0]
           expect(body[0]).to.have.property prop, group[prop]
@@ -89,6 +96,24 @@ describe "#circles", ->
       .end (err, res) ->
         return done(err) if err
         done()
+
+  it "should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Fsimontegg&based_near=http://www.geonames.org/2179537/wellington.html", (done) ->
+    graphdb.jsonld.put bestGroup, (err) ->
+      expect(err).to.not.exist
+
+      request
+      .get("/circles?members=" + urlencode(bestGroup.members[0]["@id"]) + "&based_near=" + urlencode(bestGroup.based_near))
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .expect (req) ->
+        body = req.body
+        expect(body).to.have.length(1)
+        for prop of body[0]
+          expect(body[0]).to.have.property prop, group[prop]
+        return
+      .end (err, res) ->
+        return done(err) if err
+        done()    
 
   it "should GET /circles/:id", (done) ->
       graphdb.jsonld.put group, (err, obj) ->
