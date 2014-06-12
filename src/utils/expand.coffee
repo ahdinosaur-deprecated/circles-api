@@ -5,22 +5,26 @@ jsonld = require "jsonld"
 jsonld = jsonld.promises()
 _ = require "lodash"
 
+parseExpandedObj = (obj, key, callback) ->
+  newObj = {}
+  newObj[key] = obj[key][0]['@value']
+  callback null, newObj
+  return
+
+parseExpandedObj = Promise.promisify parseExpandedObj
+
 expand = (doc, context, callback) ->
+  console.log 'expand fired', doc
   doc['@context'] = context
   jsonld.expand(doc)
-    .then ((expandedDoc) ->
-      keys = Object.keys(expandedDoc[0])
-      newDoc = {}
-      Promise
-        .map(keys, (key) ->
-          newDoc[key] = expandedDoc[0][key][0]['@value']
-          return newDoc
-          )
-        .nodeify(callback)
-      return
-      ), (error, expandedDoc) ->
-        callback error
-        return
+    .then((arr) -> 
+      obj = arr[0]
+      keys = Object.keys(obj)
+      Promise.map(keys, (key) -> 
+        console.log 'indexedddd', key
+        parseExpandedObj(obj, key)
+        )
+      .nodeify(callback))
   return
 
 

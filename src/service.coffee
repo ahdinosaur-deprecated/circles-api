@@ -26,12 +26,12 @@ module.exports = service = (db) ->
     # [{member: 'http://open.app/people/simontegg'}, {based_near: http://www.geonames.org/2179537/wellington.html}]
     # [{subject: "@@id", predicate: "based_near", object: "http://www.geonames.org/2179537/wellington.html"}]
     
-
+    console.log 'QUERY ', query
     switch queryTest query
       when "uncompliant_query"
-        console.log 'query', query
         expandQuery(query, context)
           .map((expandedQuery) ->
+            console.log 'expandedQuery', expandedQuery
             return aliasValue(expandedQuery, db.v))
           .then((compliantQueries) ->
             baseQuery =

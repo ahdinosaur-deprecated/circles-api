@@ -63,16 +63,59 @@ describe "#circles", ->
           expect(body).to.have.property prop, group[prop]
         done()
 
-  it "should GET /circles", (done) ->
+  # it "should GET /circles", (done) ->
 
+  #   data = utils.normalizeData(config, group)
+
+  #   graphdb.jsonld.put data, (err) ->
+  #     expect(err).to.not.exist
+  #     console.log 'putted group', group
+
+  #     request
+  #     .get("/circles")
+  #     .expect("Content-Type", /json/)
+  #     .expect(200)
+  #     .expect (req) ->
+  #       body = req.body
+  #       expect(body).to.have.length(1)
+  #       for prop of body[0]
+  #         expect(body[0]).to.have.property prop, group[prop]
+  #       return
+  #     .end (err, res) ->
+  #       return done(err) if err
+  #       done()
+
+  # it "should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Faaronthornton", (done) ->
+    
+  #   data = utils.normalizeData(config, group)
+
+  #   graphdb.jsonld.put data, (err) ->
+  #     expect(err).to.not.exist
+
+  #     request
+  #     .get("/circles?members=" + urlencode(group['http://open.app/relations/members'][1]["@id"]))
+  #     .expect("Content-Type", /json/)
+  #     .expect(200)
+  #     .expect (req) ->
+  #       body = req.body
+  #       expect(body).to.have.length(1)
+  #       for prop of body[0]
+  #         expect(body[0]).to.have.property prop, group[prop]
+  #       return
+  #     .end (err, res) ->
+  #       return done(err) if err
+  #       done()
+
+  it "should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Fsimontegg&based_near=http://www.geonames.org/2179537/wellington.html", (done) ->
+    
     data = utils.normalizeData(config, group)
 
     graphdb.jsonld.put data, (err) ->
       expect(err).to.not.exist
-      console.log 'putted group', group
+      console.log 'putted group', data
 
       request
-      .get("/circles")
+      .get("/circles?members=" + urlencode(group['http://open.app/relations/members'][1]["@id"]) + "&based_near=" + urlencode(group.based_near))
       .expect("Content-Type", /json/)
       .expect(200)
       .expect (req) ->
@@ -83,43 +126,7 @@ describe "#circles", ->
         return
       .end (err, res) ->
         return done(err) if err
-        done()
-
-  it "should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Faaronthornton", (done) ->
-    graphdb.jsonld.put group, (err) ->
-      expect(err).to.not.exist
-
-      request
-      .get("/circles?members=" + urlencode(group['http://open.app/relations/members'][1]["@id"]))
-      .expect("Content-Type", /json/)
-      .expect(200)
-      .expect (req) ->
-        body = req.body
-        expect(body).to.have.length(1)
-        for prop of body[0]
-          expect(body[0]).to.have.property prop, group[prop]
-        return
-      .end (err, res) ->
-        return done(err) if err
-        done()
-
-#   it "should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Fsimontegg&based_near=http://www.geonames.org/2179537/wellington.html", (done) ->
-#     graphdb.jsonld.put bestGroup, (err) ->
-#       expect(err).to.not.exist
-
-#       request
-#       .get("/circles?members=" + urlencode(bestGroup.members[0]["@id"]) + "&based_near=" + urlencode(bestGroup.based_near))
-#       .expect("Content-Type", /json/)
-#       .expect(200)
-#       .expect (req) ->
-#         body = req.body
-#         expect(body).to.have.length(1)
-#         for prop of body[0]
-#           expect(body[0]).to.have.property prop, group[prop]
-#         return
-#       .end (err, res) ->
-#         return done(err) if err
-#         done()    
+        done()    
 
 #   it "should GET /circles/:id", (done) ->
 #       graphdb.jsonld.put group, (err, obj) ->

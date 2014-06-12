@@ -8,14 +8,19 @@ _ = require "lodash"
 expandQuery = (queryObj, context, callback) ->
   callback null, [] if Object.keys(queryObj).length is 0
   expand(queryObj, context)
-    .map((obj) ->
-      key = Object.keys(obj)[0]
-      value = obj[key]
-      return {
-        subject: "@@id"
-        predicate: key
-        object: value
-      })
+    .then((queries) ->
+      console.log 'queries', queries
+      Promise.map(queries, (query) ->
+        if _.isPlainObject query
+          key = Object.keys(query)[0]
+          return {
+            subject: "@@id"
+            predicate: key
+            object: query[key]
+          }
+        else
+          error = new Error "query isn't an object"
+        ))
     .nodeify(callback)
   return
 

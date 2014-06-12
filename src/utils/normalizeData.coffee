@@ -1,6 +1,7 @@
 defaultID = require('./defaultID')
 aliasKey = require('./aliasKey')
 hasType = require('./hasType')
+context = require('../context')
 
 normalizeData = (config, data) ->
   # alias id to @id
@@ -11,6 +12,9 @@ normalizeData = (config, data) ->
   data = aliasKey(data, "type", "@type")
   # ensure @type has config.type
   data = hasType(data, config.entity.type)
+
+  if not data['@context']
+    data['@context'] = context
 
   data
 
