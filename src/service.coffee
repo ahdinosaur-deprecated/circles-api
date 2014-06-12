@@ -5,12 +5,14 @@ jsonld = require('jsonld')
 jsonld = jsonld.promises()
 
 utils = require('./utils/')
+aliasValue = require('./utils/aliasValue')
 context = require('./context')
 config = require('./config')
 
 
 queryTest = require('./utils/queryTest')
 expandQuery = require('./utils/expandQuery')
+#baseQuery = require('./utils/baseQuery')
 
 module.exports = service = (db) ->
   # setup levelgraph-jsonld db
@@ -24,22 +26,28 @@ module.exports = service = (db) ->
     # [{member: 'http://open.app/people/simontegg'}, {based_near: http://www.geonames.org/2179537/wellington.html}]
     # [{subject: "@@id", predicate: "based_near", object: "http://www.geonames.org/2179537/wellington.html"}]
     
-    console.log queryTest(query), query
 
     switch queryTest query
       when "uncompliant_query"
+        console.log 'query', query
         expandQuery(query, context)
+          .map((expandedQuery) ->
+            return aliasValue(expandedQuery, db.v))
           .then((compliantQueries) ->
             baseQuery =
               subject: db.v('@id')
               predicate: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-              object: config.entity.type
+              object: 'http://xmlns.com/foaf/0.1/Group'
 
             compliantQueries.push baseQuery
+            console.log 'compliantQueries', compliantQueries
             return find({ query: compliantQueries }, callback))
       when "compliant_array"
-        db.search query, (error, circles) ->
+        db.search query[0], (error, circles) ->
+          console.log error
           return callback(error) if error
+
+          console.log 'found circles', circles
           callback(null, circles)
     # TODO simple query eg. GET /circles?member=simontegg
     #  utils.expandSimpleQuery(query, context)
@@ -52,6 +60,7 @@ module.exports = service = (db) ->
   create = (data, params, callback) ->
     # normalize data
     data = utils.normalizeData(config, data)
+    console.log 'putting data', data
     # put group in database
     db.jsonld.put data, (error, group) ->
       # if error, return error

@@ -1,4 +1,4 @@
-# method to expand a term to its IRI
+# method to expand a simple query to a query compliant with levelgraph search 
 validator = require "validator"
 config = require "../config"
 expand = require "./expand"
@@ -6,11 +6,10 @@ Promise = require "bluebird"
 _ = require "lodash"
 
 expandQuery = (queryObj, context, callback) ->
+  callback null, [] if Object.keys(queryObj).length is 0
   expand(queryObj, context)
     .map((obj) ->
       key = Object.keys(obj)[0]
-      if not key?
-        return []
       value = obj[key]
       return {
         subject: "@@id"
@@ -18,6 +17,7 @@ expandQuery = (queryObj, context, callback) ->
         object: value
       })
     .nodeify(callback)
+  return
 
 module.exports = Promise.promisify expandQuery
 

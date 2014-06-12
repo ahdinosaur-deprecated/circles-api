@@ -4,18 +4,18 @@ _ = require "lodash"
 queryTest = (query) ->
 
   compliant = (obj) ->
-    if "subject" in obj and "predicate" in obj and "object" in obj
+    if "subject" of obj and "predicate" of obj and "object" of obj
       return true
     else
       return false
 
   if _.isPlainObject query
     if compliant(query)
-      return "compliant_query_object"
+      return "compliant_query"
     else
       return "uncompliant_query"
   if _.isArray query
-    if _.every query, compliant
+    if query.every compliant
       return "compliant_array"
     else
       return "uncompliant_array"

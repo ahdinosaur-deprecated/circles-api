@@ -18,6 +18,7 @@ describe "generate context", ->
       schema: "https://schema.org/"
 
       #properties
+      based_near: "foaf:based_near"
       description: "schema:description"
       name: "foaf:name"
       members: "relations:members"

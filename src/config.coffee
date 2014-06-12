@@ -66,6 +66,12 @@ module.exports =
     ]
     properties: [
       {
+        id: "foaf:based_near"
+        key: "based_near"
+        schema: Joi.string().alphanum()
+      }
+
+      {
         id: "foaf:name",
         key: "name",
         schema: Joi.string().alphanum().required()
@@ -80,10 +86,9 @@ module.exports =
         key: "members"
         schema: Joi.array().optional(),
         type: [Agent, Person, Circle]
-
       }
     ]
-    type: "foaf:Group"
+    type: "http://xmlns.com/foaf/0.1/Group"
   url: 
     protocol: "http:"
     host: "open.app"

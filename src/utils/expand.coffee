@@ -7,7 +7,6 @@ _ = require "lodash"
 
 expand = (doc, context, callback) ->
   doc['@context'] = context
-  console.log doc
   jsonld.expand(doc)
     .then ((expandedDoc) ->
       keys = Object.keys(expandedDoc[0])

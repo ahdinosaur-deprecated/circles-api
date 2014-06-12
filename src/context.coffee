@@ -3,6 +3,7 @@ module.exports =
   relations: 'http://open.app/relations/'
   schema: 'https://schema.org/'
   name: 'foaf:name'
+  based_near: 'foaf:based_near'
   description: 'schema:description'
   members: 'relations:members'
   circles: 'http://open.app/circles'
