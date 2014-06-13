@@ -25,7 +25,7 @@
   group = {
     id: "http://circles.app.enspiral.com/loomiocommunity",
     name: "Loomio Community",
-    based_near: "http://www.geonames.org/2179537/wellington.html",
+    'http://xmlns.com/foaf/0.1/based_near': "http://www.geonames.org/2179537/wellington.html",
     'http://open.app/relations/members': [
       {
         "@id": "http://open.app/people/aaronthornton"
@@ -70,13 +70,13 @@
         });
       });
     });
-    it("should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Fsimontegg&based_near=http://www.geonames.org/2179537/wellington.html", function(done) {
+    it("should GET /circles", function(done) {
       var data;
       data = utils.normalizeData(config, group);
       return graphdb.jsonld.put(data, function(err) {
         expect(err).to.not.exist;
-        console.log('putted group', data);
-        return request.get("/circles?members=" + urlencode(group['http://open.app/relations/members'][1]["@id"]) + "&based_near=" + urlencode(group.based_near)).expect("Content-Type", /json/).expect(200).expect(function(req) {
+        console.log('putted group', group);
+        return request.get("/circles").expect("Content-Type", /json/).expect(200).expect(function(req) {
           var body, prop;
           body = req.body;
           expect(body).to.have.length(1);

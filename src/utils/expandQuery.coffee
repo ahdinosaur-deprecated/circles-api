@@ -7,9 +7,10 @@ _ = require "lodash"
 
 expandQuery = (queryObj, context, callback) ->
   callback null, [] if Object.keys(queryObj).length is 0
+
   expand(queryObj, context)
     .then((queries) ->
-      console.log 'queries', queries
+
       Promise.map(queries, (query) ->
         if _.isPlainObject query
           key = Object.keys(query)[0]
