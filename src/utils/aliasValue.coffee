@@ -2,6 +2,7 @@ Promise = require "bluebird"
 
 aliasValue = (obj, f, callback) ->
   keys = Object.keys(obj)
+  console.log 'keys', keys
   for key, i in keys
     console.log 'obj[key]', obj[key]
     if obj[key][0..1] is '@@'

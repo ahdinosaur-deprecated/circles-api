@@ -16,8 +16,8 @@ graphdb = undefined
 group =
   id: "http://circles.app.enspiral.com/loomiocommunity"
   name: "Loomio Community"
-  'http://xmlns.com/foaf/0.1/based_near': "http://www.geonames.org/2179537/wellington.html"
-  'http://open.app/relations/members': [
+  "based_near": "http://www.geonames.org/2179537/wellington.html"
+  "members": [
     {
       "@id": "http://open.app/people/aaronthornton"
 #      name: "Aaron Thornton"
@@ -58,6 +58,7 @@ describe "#circles", ->
     .end (err, res) ->
       return done(err) if err
       graphdb.jsonld.get group['@id'], context, (err, body) ->
+        console.log 'body in post', body
         return done(err) if err
         for prop of body
           expect(body).to.have.property prop, group[prop]
@@ -69,7 +70,6 @@ describe "#circles", ->
 
     graphdb.jsonld.put data, (err) ->
       expect(err).to.not.exist
-      console.log 'putted group', group
 
       request
       .get("/circles")
@@ -85,86 +85,90 @@ describe "#circles", ->
         return done(err) if err
         done()
 
-  # it "should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Faaronthornton", (done) ->
+  it "should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Faaronthornton", (done) ->
     
-  #   data = utils.normalizeData(config, group)
+    data = utils.normalizeData(config, group)
 
-  #   graphdb.jsonld.put data, (err) ->
-  #     expect(err).to.not.exist
-  #     console.log data
+    graphdb.jsonld.put data, (err) ->
+      expect(err).to.not.exist
+      console.log data
 
-  #     request
-  #     .get("/circles?&name=" + urlencode(group['name']))
-  #     .expect("Content-Type", /json/)
-  #     .expect(200)
-  #     .expect (req) ->
-  #       body = req.body
-  #       expect(body).to.have.length(1)
-  #       for prop of body[0]
-  #         expect(body[0]).to.have.property prop, group[prop]
-  #       return
-  #     .end (err, res) ->
-  #       return done(err) if err
-  #       done()
+      request
+      .get("/circles?&members=" + urlencode(group["members"][0]["@id"]))
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .expect (req) ->
+        body = req.body
+        expect(body).to.have.length(1)
+        for prop of body[0]
+          expect(body[0]).to.have.property prop, group[prop]
+        return
+      .end (err, res) ->
+        return done(err) if err
+        done()
 
-  # it "should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Fsimontegg&based_near=http://www.geonames.org/2179537/wellington.html", (done) ->
+  it "should GET /circles?based_near=http://www.geonames.org/2179537/wellington.html", (done) ->
     
-  #   data = utils.normalizeData(config, group)
+    data = utils.normalizeData(config, group)
 
-  #   graphdb.jsonld.put data, (err) ->
-  #     expect(err).to.not.exist
-  #     console.log 'putted group', data
+    graphdb.jsonld.put data, (err, obj) ->
+      expect(err).to.not.exist
 
-  #     request
-  #     .get("/circles?members=" + urlencode(group['http://open.app/relations/members'][1]["@id"]) + "&based_near=" + urlencode(group['http://xmlns.com/foaf/0.1/based_near']))
-  #     .expect("Content-Type", /json/)
-  #     .expect(200)
-  #     .expect (req) ->
-  #       body = req.body
-  #       expect(body).to.have.length(1)
-  #       for prop of body[0]
-  #         expect(body[0]).to.have.property prop, group[prop]
-  #       return
-  #     .end (err, res) ->
-  #       return done(err) if err
-  #       done()    
+      request
+      .get("/circles?based_near=" + urlencode(group['based_near']))
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .expect (req) ->
+        body = req.body
+        console.log 'BODY', body
+        expect(body).to.have.length(1)
+        for prop of body[0]
+          expect(body[0]).to.have.property prop, group[prop]
+        return
+      .end (err, res) ->
+        return done(err) if err
+        done()    
 
-#   it "should GET /circles/:id", (done) ->
-#       graphdb.jsonld.put group, (err, obj) ->
-#         expect(err).to.not.exist
+  it "should GET /circles/:id", (done) ->
+      graphdb.jsonld.put group, (err, obj) ->
+        expect(err).to.not.exist
 
-#         request
-#         .get("/circles/" + urlencode(obj['@id']))
-#         .expect("Content-Type", /json/)
-#         .expect(200)
-#         .expect((req) ->
-#           body = req.body
-#           for prop of body
-#             expect(body).to.have.property prop, group[prop]
-#           return)
-#         .end((err, res) ->
-#           return done(err)  if err
-#           done())
+        request
+        .get("/circles/" + urlencode(obj['@id']))
+        .expect("Content-Type", /json/)
+        .expect(200)
+        .expect((req) ->
+          body = req.body
+          console.log 'get circles/:id', body
 
-#   it "should PUT /circles/:id", (done) ->
-#     body = undefined
+          for prop of body
+            console.log 'PROP',prop, body[prop]
+            console.log 'PROP expected', group[prop]
+            expect(body).to.have.property prop
+          return)
+        .end((err, res) ->
+          return done(err)  if err
+          done())
 
-#     request
-#     .put("/circles/" + urlencode(group['@id']))
-#     .send(group)
-#     .expect("Content-Type", /json/)
-#     .expect(200)
-#     .expect((req) ->
-#       body = req.body
-#       for prop of body
-#         expect(body).to.have.property prop, group[prop]
-#       return)
-#     .end (err, res) ->
-#       graphdb.jsonld.get body.id, context, (err, body) ->
-#         return done(err) if err
-#         for prop of body
-#           expect(body).to.have.property prop, group[prop]
-#         done()
+  it "should PUT /circles/:id", (done) ->
+    body = undefined
+
+    request
+    .put("/circles/" + urlencode(group['@id']))
+    .send(group)
+    .expect("Content-Type", /json/)
+    .expect(200)
+    .expect((req) ->
+      body = req.body
+      for prop of body
+        expect(body).to.have.property prop, group[prop]
+      return)
+    .end (err, res) ->
+      graphdb.jsonld.get body.id, context, (err, body) ->
+        return done(err) if err
+        for prop of body
+          expect(body).to.have.property prop
+        done()
 
 #   #TODO
 # #  it "should GET /circles/:id/members", (done) ->

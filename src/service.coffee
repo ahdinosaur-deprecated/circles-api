@@ -19,20 +19,21 @@ module.exports = service = (db) ->
   db = levelgraphJsonld(levelgraph(db))
 
   find = (params, callback) ->
-    console.log 'params', params
+    
     query = (params && params.query) || {}
+    console.log 'params', JSON.stringify(params)
     # {}
     # {member: 'http://open.app/people/simontegg'}
     # [{member: 'http://open.app/people/simontegg'}]
     # [{member: 'http://open.app/people/simontegg'}, {based_near: http://www.geonames.org/2179537/wellington.html}]
     # [{subject: "@@id", predicate: "based_near", object: "http://www.geonames.org/2179537/wellington.html"}]
     
-
     switch queryTest query
       when "uncompliant_query"
 
         expandQuery(query, context)
           .map((expandedQuery) ->
+            console.log 'expandedQuery', expandedQuery
             return aliasValue(expandedQuery, db.v))
           .then((compliantQueries) ->
             baseQuery =
@@ -40,22 +41,23 @@ module.exports = service = (db) ->
               predicate: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
               object: 'http://xmlns.com/foaf/0.1/Group'
 
-            compliantQueries.push baseQuery
-
+            if compliantQueries.length is 0  
+              compliantQueries.push baseQuery
             return find({ query: compliantQueries }, callback))
       when "compliant_array"
 
-
-
-        q =
+        q = 
           subject: db.v('@id')
-          predicate: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-          object: 'http://xmlns.com/foaf/0.1/Group' 
+          predicate: "http://xmlns.com/foaf/0.1/based_near"
+          object: 'http://www.geonames.org/2179537/wellington.html' 
           
-        
-        console.log 'q', q
+        # query = if query.length > 1 then query[1] else query
 
-        db.search [q], (error, circles) ->
+        console.log 'compliant_array', JSON.stringify(query)
+
+
+
+        db.search query, (error, circles) ->
           console.log error
           return callback(error) if error
           console.log 'found circles', circles
