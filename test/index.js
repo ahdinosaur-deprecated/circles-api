@@ -160,10 +160,7 @@
         return request.get("/circles/" + urlencode(obj['@id'])).expect("Content-Type", /json/).expect(200).expect(function(req) {
           var body, prop;
           body = req.body;
-          console.log('get circles/:id', body);
           for (prop in body) {
-            console.log('PROP', prop, body[prop]);
-            console.log('PROP expected', group[prop]);
             expect(body).to.have.property(prop);
           }
         }).end(function(err, res) {
@@ -194,6 +191,26 @@
           }
           return done();
         });
+      });
+    });
+    it("should DELETE /circles/:id", function(done) {
+      return graphdb.jsonld.put(group, function(err, obj) {
+        expect(err).to.not.exist;
+        expect(obj).to.exist;
+        return request.del("/circles/" + urlencode(group['@id'])).expect(200).end(function(err, res) {
+          return graphdb.jsonld.get(obj['@id'], context, function(err, body) {
+            expect(err).to.not.exist;
+            expect(body).to.not.exist;
+            return done();
+          });
+        });
+      });
+    });
+    afterEach(function(done) {
+      return db.createKeyStream().on('data', function(k) {
+        return db.del(k);
+      }).on('close', function() {
+        return done();
       });
     });
     return this;

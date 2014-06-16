@@ -162,11 +162,8 @@ describe "#circles", ->
         .expect(200)
         .expect((req) ->
           body = req.body
-          console.log 'get circles/:id', body
 
           for prop of body
-            console.log 'PROP',prop, body[prop]
-            console.log 'PROP expected', group[prop]
             expect(body).to.have.property prop
           return)
         .end((err, res) ->
@@ -208,27 +205,27 @@ describe "#circles", ->
 # #      return done(err)  if err
 # #      done())
 
-#   it "should DELETE /circles/:id", (done) ->
+  it "should DELETE /circles/:id", (done) ->
 
-#     graphdb.jsonld.put group, (err, obj) ->
-#       expect(err).to.not.exist
-#       expect(obj).to.exist
+    graphdb.jsonld.put group, (err, obj) ->
+      expect(err).to.not.exist
+      expect(obj).to.exist
 
-#       request
-#       .del("/circles/" + urlencode(group['@id']))
-#       .expect(200) # TODO 204
-#       .end (err, res) ->
-#         graphdb.jsonld.get obj['@id'], context, (err, body) ->
-#           expect(err).to.not.exist
-#           expect(body).to.not.exist
-#           done()
+      request
+      .del("/circles/" + urlencode(group['@id']))
+      .expect(200) # TODO 204
+      .end (err, res) ->
+        graphdb.jsonld.get obj['@id'], context, (err, body) ->
+          expect(err).to.not.exist
+          expect(body).to.not.exist
+          done()
 
-#   afterEach (done) ->
-#       # del all objects in db
-#       db.createKeyStream()
-#       .on 'data', (k) ->
-#         db.del(k)
-#       .on 'close', ->
-#         done()
+  afterEach (done) ->
+      # del all objects in db
+      db.createKeyStream()
+      .on 'data', (k) ->
+        db.del(k)
+      .on 'close', ->
+        done()
 
   @
