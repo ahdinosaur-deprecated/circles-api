@@ -112,16 +112,32 @@
         });
       });
     });
+    it("should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Faaronthornton&based_near=http://www.geonames.org/2179537/wellington.html", function(done) {
+      var data;
+      data = utils.normalizeData(config, group);
+      return graphdb.jsonld.put(data, function(err, obj) {
+        expect(err).to.not.exist;
+        return request.get("/circles?members=" + urlencode(group["members"][0]['@id']) + "&based_near=" + urlencode(group['based_near'])).expect("Content-Type", /json/).expect(200).expect(function(req) {
+          var body, prop;
+          body = req.body;
+          console.log('BODY', body);
+          expect(body).to.have.length(1);
+          for (prop in body[0]) {
+            expect(body[0]).to.have.property(prop, group[prop]);
+          }
+        }).end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+          return done();
+        });
+      });
+    });
     it("should GET /circles?based_near=http://www.geonames.org/2179537/wellington.html", function(done) {
       var data;
       data = utils.normalizeData(config, group);
-      console.log('GET based_near data', data);
       return graphdb.jsonld.put(data, function(err, obj) {
-        var q;
         expect(err).to.not.exist;
-        console.log('putted obj', obj);
-        q = "/circles?based_near=" + urlencode(group['based_near']);
-        console.log('query', q);
         return request.get("/circles?based_near=" + urlencode(group['based_near'])).expect("Content-Type", /json/).expect(200).expect(function(req) {
           var body, prop;
           body = req.body;

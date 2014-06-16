@@ -107,6 +107,29 @@ describe "#circles", ->
         return done(err) if err
         done()
 
+  it "should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Faaronthornton&based_near=http://www.geonames.org/2179537/wellington.html", (done) ->
+    
+    data = utils.normalizeData(config, group)
+
+    graphdb.jsonld.put data, (err, obj) ->
+      expect(err).to.not.exist
+
+      request
+      .get("/circles?members=" + urlencode(group["members"][0]['@id']) + "&based_near=" + urlencode(group['based_near']))
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .expect (req) ->
+        body = req.body
+        console.log 'BODY', body
+        expect(body).to.have.length(1)
+        for prop of body[0]
+          expect(body[0]).to.have.property prop, group[prop]
+        return
+      .end (err, res) ->
+        return done(err) if err
+        done() 
+
+
   it "should GET /circles?based_near=http://www.geonames.org/2179537/wellington.html", (done) ->
     
     data = utils.normalizeData(config, group)
@@ -127,7 +150,7 @@ describe "#circles", ->
         return
       .end (err, res) ->
         return done(err) if err
-        done()    
+        done()      
 
   it "should GET /circles/:id", (done) ->
       graphdb.jsonld.put group, (err, obj) ->
