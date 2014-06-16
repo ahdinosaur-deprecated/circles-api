@@ -15,6 +15,7 @@ queryTest = (query) ->
     else
       return "uncompliant_query"
   if _.isArray query
+    #TODO cross browser friendly
     if query.every compliant
       return "compliant_array"
     else

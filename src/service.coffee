@@ -19,18 +19,10 @@ module.exports = service = (db) ->
   db = levelgraphJsonld(levelgraph(db))
 
   find = (params, callback) ->
-    
     query = (params && params.query) || {}
-    console.log 'params', JSON.stringify(params)
-    # {}
-    # {member: 'http://open.app/people/simontegg'}
-    # [{member: 'http://open.app/people/simontegg'}]
-    # [{member: 'http://open.app/people/simontegg'}, {based_near: http://www.geonames.org/2179537/wellington.html}]
-    # [{subject: "@@id", predicate: "based_near", object: "http://www.geonames.org/2179537/wellington.html"}]
-    
+
     switch queryTest query
       when "uncompliant_query"
-
         expandQuery(query, context)
           .map((expandedQuery) ->
             console.log 'expandedQuery', expandedQuery
@@ -40,35 +32,20 @@ module.exports = service = (db) ->
               subject: db.v('@id')
               predicate: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
               object: 'http://xmlns.com/foaf/0.1/Group'
-
-            if compliantQueries.length is 0  
-              compliantQueries.push baseQuery
+ 
+            compliantQueries.push baseQuery
             return find({ query: compliantQueries }, callback))
+      when "compliant_query"
+        return find({ query: [query] }, callback)
+      when "uncompliant_array"
+        error = new Error "your query is messed up"
+        callback error
       when "compliant_array"
-
-        q = 
-          subject: db.v('@id')
-          predicate: "http://xmlns.com/foaf/0.1/based_near"
-          object: 'http://www.geonames.org/2179537/wellington.html' 
-          
-        # query = if query.length > 1 then query[1] else query
-
-        console.log 'compliant_array', JSON.stringify(query)
-
-
-
         db.search query, (error, circles) ->
           console.log error
           return callback(error) if error
           console.log 'found circles', circles
           callback(null, circles)
-    # TODO simple query eg. GET /circles?member=simontegg
-    #  utils.expandSimpleQuery(query, context)
-    #    .then(find)
-    #    .then((circles) ->
-    #      res.json 200, circles)
-
-
 
   create = (data, params, callback) ->
     # normalize data
