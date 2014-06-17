@@ -4,6 +4,9 @@ urlencode = require("urlencode")
 require('longjohn')
 
 context = require('../lib/context')
+config = require('../lib/config')
+
+utils = require('../lib/utils/')
 
 app = undefined
 db = undefined
@@ -11,16 +14,16 @@ graphdb = undefined
 # group = undefined 
 
 group =
-  '@id': "http://open.app/circles/loomiocommunity"
-  '@type': "foaf:Group"
+  id: "http://circles.app.enspiral.com/loomiocommunity"
   name: "Loomio Community"
-  members: [
+  "based_near": "http://www.geonames.org/2179537/wellington.html"
+  "members": [
     {
-      "@id": "people:aaronthornton"
+      "@id": "http://open.app/people/aaronthornton"
 #      name: "Aaron Thornton"
     },
     {
-      "@id": "people:simontegg"
+      "@id": "http://open.app/people/simontegg"
 #      name: "Simon Tegg"
     }
   ]
@@ -29,6 +32,14 @@ group =
 bestGroup =
   id: "http://circles.app.enspiral.com/bestgroup"
   name: "Best Group"
+  based_near: "http://www.geonames.org/2179537/wellington.html"
+  members: [
+    {
+      "@id": "http://open.app/people/simontegg"
+    }
+
+
+  ]
 
 describe "#circles", ->
   before ->
@@ -47,6 +58,7 @@ describe "#circles", ->
     .end (err, res) ->
       return done(err) if err
       graphdb.jsonld.get group['@id'], context, (err, body) ->
+        console.log 'body in post', body
         return done(err) if err
         for prop of body
           expect(body).to.have.property prop, group[prop]
@@ -54,7 +66,9 @@ describe "#circles", ->
 
   it "should GET /circles", (done) ->
 
-    graphdb.jsonld.put group, (err) ->
+    data = utils.normalizeData(config, group)
+
+    graphdb.jsonld.put data, (err) ->
       expect(err).to.not.exist
 
       request
@@ -71,6 +85,73 @@ describe "#circles", ->
         return done(err) if err
         done()
 
+  it "should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Faaronthornton", (done) ->
+    
+    data = utils.normalizeData(config, group)
+
+    graphdb.jsonld.put data, (err) ->
+      expect(err).to.not.exist
+      console.log data
+
+      request
+      .get("/circles?&members=" + urlencode(group["members"][0]["@id"]))
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .expect (req) ->
+        body = req.body
+        expect(body).to.have.length(1)
+        for prop of body[0]
+          expect(body[0]).to.have.property prop, group[prop]
+        return
+      .end (err, res) ->
+        return done(err) if err
+        done()
+
+  it "should GET /circles?members=http%3A%2F%2Fopen.app%2Fpeople%2Faaronthornton&based_near=http://www.geonames.org/2179537/wellington.html", (done) ->
+    
+    data = utils.normalizeData(config, group)
+
+    graphdb.jsonld.put data, (err, obj) ->
+      expect(err).to.not.exist
+
+      request
+      .get("/circles?members=" + urlencode(group["members"][0]['@id']) + "&based_near=" + urlencode(group['based_near']))
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .expect (req) ->
+        body = req.body
+        console.log 'BODY', body
+        expect(body).to.have.length(1)
+        for prop of body[0]
+          expect(body[0]).to.have.property prop, group[prop]
+        return
+      .end (err, res) ->
+        return done(err) if err
+        done() 
+
+
+  it "should GET /circles?based_near=http://www.geonames.org/2179537/wellington.html", (done) ->
+    
+    data = utils.normalizeData(config, group)
+
+    graphdb.jsonld.put data, (err, obj) ->
+      expect(err).to.not.exist
+
+      request
+      .get("/circles?based_near=" + urlencode(group['based_near']))
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .expect (req) ->
+        body = req.body
+        console.log 'BODY', body
+        expect(body).to.have.length(1)
+        for prop of body[0]
+          expect(body[0]).to.have.property prop, group[prop]
+        return
+      .end (err, res) ->
+        return done(err) if err
+        done()      
+
   it "should GET /circles/:id", (done) ->
       graphdb.jsonld.put group, (err, obj) ->
         expect(err).to.not.exist
@@ -81,25 +162,9 @@ describe "#circles", ->
         .expect(200)
         .expect((req) ->
           body = req.body
-          for prop of body
-            expect(body).to.have.property prop, group[prop]
-          return)
-        .end((err, res) ->
-          return done(err)  if err
-          done())
 
-  it "should GET /circles/:shortID", (done) ->
-    graphdb.jsonld.put group, (err, obj) ->
-        expect(err).to.not.exist
-
-        request
-        .get("/circles/" + urlencode('loomiocommunity'))
-        .expect("Content-Type", /json/)
-        .expect(200)
-        .expect((req) ->
-          body = req.body
           for prop of body
-            expect(body).to.have.property prop, group[prop]
+            expect(body).to.have.property prop
           return)
         .end((err, res) ->
           return done(err)  if err
@@ -122,23 +187,23 @@ describe "#circles", ->
       graphdb.jsonld.get body.id, context, (err, body) ->
         return done(err) if err
         for prop of body
-          expect(body).to.have.property prop, group[prop]
+          expect(body).to.have.property prop
         done()
 
-  #TODO
-#  it "should GET /circles/:id/members", (done) ->
-#    request
-#    .get("/circles/" + urlencode(group['@id']) + "/members")
-#    .expect("Content-Type", /json/)
-#    .expect(200)
-#    .expect((req) ->
-#      body = req.body
-#      console.log body, 'members'
-#      expect(body).to.contain.keys '@id', "name"
-#      return)
-#    .end((err, res) ->
-#      return done(err)  if err
-#      done())
+#   #TODO
+# #  it "should GET /circles/:id/members", (done) ->
+# #    request
+# #    .get("/circles/" + urlencode(group['@id']) + "/members")
+# #    .expect("Content-Type", /json/)
+# #    .expect(200)
+# #    .expect((req) ->
+# #      body = req.body
+# #      console.log body, 'members'
+# #      expect(body).to.contain.keys '@id', "name"
+# #      return)
+# #    .end((err, res) ->
+# #      return done(err)  if err
+# #      done())
 
   it "should DELETE /circles/:id", (done) ->
 
